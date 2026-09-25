@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PDF Toolkit - Offline</title>
+<link rel="stylesheet" href="style.css">
+<script src="jspdf.umd.min.js"></script>
+<script src="pdf-lib.min.js"></script>
+<script src="pdf.min.js"></script>
+<script src="jszip.min.js"></script>
+</head>
+<body>
+
+<header>
+  <h1>📄 PDF Toolkit</h1>
+  <p>JPG to PDF • PDF to JPG • PDF Merge • Image Resizer • PDF Resizer</p>
+</header>
+
+<div class="lib-status" id="libStatus">Libraries check हुँदैछ...</div>
+
+<div class="tabs">
+  <button class="tab-btn active" data-tab="jpg2pdf">🖼️ JPG to PDF</button>
+  <button class="tab-btn" data-tab="pdf2jpg">🖼️ PDF to JPG</button>
+  <button class="tab-btn" data-tab="merge">🔗 PDF Merge</button>
+  <button class="tab-btn" data-tab="imgresize">📐 Image Resizer</button>
+  <button class="tab-btn" data-tab="pdfresize">📏 PDF Resizer</button>
+</div>
+
+<!-- ============ JPG TO PDF ============ -->
+<div class="panel active" id="jpg2pdf">
+  <h2>JPG / PNG लाई PDF मा Convert गर्नुहोस्</h2>
+  <div class="drop-zone" id="jpgDrop">
+    <div style="font-size:36px">📁</div>
+    <p><strong>Click to upload</strong> or drag & drop images</p>
+    <p>Drag गरेर order मिलाउन सकिन्छ • ↻ थिचेर rotate गर्न सकिन्छ</p>
+  </div>
+  <input type="file" id="jpgInput" accept="image/*" multiple>
+
+  <div class="top-action-bar" id="jpgTopBar" style="display:none">
+    <span class="count-badge" id="jpgCount">0 files</span>
+    <button class="action-btn" id="jpgConvertTop">🖼️ Convert to PDF</button>
+  </div>
+
+  <div class="file-grid" id="jpgList"></div>
+  <div class="hint" id="jpgHint" style="display:none">☰ Card drag गरेर क्रम मिलाउनुहोस् • ↻ Rotate button ले 90° clockwise घुमाउनुहोस्</div>
+
+  <div class="options" style="margin-top:20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px">
+    <div><label style="display:block;font-size:13px;font-weight:600;margin-bottom:5px;color:#555">Page Size</label>
+      <select id="jpgPageSize" style="width:100%;padding:9px 12px;border:1px solid #ddd;border-radius:6px;font-size:14px">
+        <option value="fit">Fit to Image</option>
+        <option value="a4">A4</option>
+        <option value="letter">Letter</option>
+      </select>
+    </div>
+    <div><label style="display:block;font-size:13px;font-weight:600;margin-bottom:5px;color:#555">Orientation</label>
+      <select id="jpgOrientation" style="width:100%;padding:9px 12px;border:1px solid #ddd;border-radius:6px;font-size:14px">
+        <option value="auto">Auto</option>
+        <option value="portrait">Portrait</option>
+        <option value="landscape">Landscape</option>
+      </select>
+    </div>
+    <div><label style="display:block;font-size:13px;font-weight:600;margin-bottom:5px;color:#555">Margin (mm)</label>
+      <input type="number" id="jpgMargin" value="10" min="0" max="50" style="width:100%;padding:9px 12px;border:1px solid #ddd;border-radius:6px;font-size:14px">
+    </div>
+    <div><label style="display:block;font-size:13px;font-weight:600;margin-bottom:5px;color:#555">Quality (0.1–1)</label>
+      <input type="number" id="jpgQuality" value="0.9" step="0.1" min="0.1" max="1" style="width:100%;padding:9px 12px;border:1px solid #ddd;border-radius:6px;font-size:14px">
+    </div>
+  </div>
+
+  <button class="action-btn bottom-action-btn" id="jpgConvertBtn">Convert to PDF</button>
+  <div class="status" id="jpgStatus"></div>
+</div>
+
+<!-- ============ PDF TO JPG ============ -->
+<div class="panel" id="pdf2jpg">
+  <h2>PDF लाई JPG image मा Convert गर्नुहोस्</h2>
+  <div class="drop-zone" id="pdf2jpgDrop">
+    <div style="font-size:36px">🖼️</div>
+    <p><strong>Click to upload</strong> a PDF</p>
+    <p>हरेक page एउटा JPG image बन्नेछ</p>
+  </div>
+  <input type="file" id="pdf2jpgInput" accept="application/pdf">
+
+  <div class="top-action-bar" id="pdf2jpgTopBar" style="display:none">
+    <span class="count-badge" id="pdf2jpgCount">0 pages</span>
+    <button class="action-btn" id="pdf2jpgConvertTop">🖼️ Convert to JPG</button>
+  </div>
+
+  <div class="file-grid" id="pdf2jpgList"></div>
+
+  <div class="options" style="margin-top:20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px">
+    <div><label style="display:block;font-size:13px;font-weight:600;margin-bottom:5px;color:#555">Image Quality</label>
+      <select id="pdf2jpgQuality" style="width:100%;padding:9px 12px;border:1px solid #ddd;border-radius:6px;font-size:14px">
+        <option value="1">Standard (1x)</option>
+        <option value="1.5">High (1.5x)</option>
+        <option value="2" selected>Very High (2x)</option>
+        <option value="3">Ultra (3x)</option>
+      </select>
+    </div>
+    <div><label style="display:block;font-size:13px;font-weight:600;margin-bottom:5px;color:#555">Format</label>
+      <select id="pdf2jpgFormat" style="width:100%;padding:9px 12px;border:1px solid #ddd;border-radius:6px;font-size:14px">
+        <option value="image/jpeg">JPG</option>
+        <option value="image/png">PNG</option>
+        <option value="image/webp">WEBP</option>
+      </select>
+    </div>
+    <div><label style="display:block;font-size:13px;font-weight:600;margin-bottom:5px;color:#555">JPEG Quality (0.1–1)</label>
+      <input type="number" id="pdf2jpgJpegQuality" value="0.92" step="0.05" min="0.1" max="1" style="width:100%;padding:9px 12px;border:1px solid #ddd;border-radius:6px;font-size:14px">
+    </div>
+    <div><label style="display:block;font-size:13px;font-weight:600;margin-bottom:5px;color:#555">Download Mode</label>
+      <select id="pdf2jpgDownloadMode" style="width:100%;padding:9px 12px;border:1px solid #ddd;border-radius:6px;font-size:14px">
+        <option value="auto" selected>Auto (3+ pages = ZIP)</option>
+        <option value="individual">Always individual</option>
+        <option value="zip">Always ZIP</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="mode-info show" id="pdf2jpgModeInfo">
+    💡 <strong>Auto mode:</strong> 3 वा बढी page भए सबै JPG एक <strong>ZIP file</strong> मा download हुनेछ। 2 वा कम भए अलग-अलग।
+  </div>
+
+  <button class="action-btn bottom-action-btn" id="pdf2jpgConvertBtn">Convert to JPG</button>
+  <div class="status" id="pdf2jpgStatus"></div>
+</div>
+
+<!-- ============ PDF MERGE ============ -->
+<div class="panel" id="merge">
+  <h2>धेरै PDF लाई एउटै बनाउनुहोस् (Merge)</h2>
+  <div class="drop-zone" id="mergeDrop">
+    <div style="font-size:36px">📚</div>
+    <p><strong>Click to upload</strong> or drag & drop PDFs</p>
+    <p>Drag गरेर order मिलाउन सकिन्छ • ↻ थिचेर rotate गर्न सकिन्छ</p>
+  </div>
+  <input type="file" id="mergeInput" accept="application/pdf" multiple>
+
+  <div class="top-action-bar" id="mergeTopBar" style="display:none">
+    <span class="count-badge" id="mergeCount">0 files</span>
+    <button class="action-btn" id="mergeTopBtn">🔗 Merge PDFs</button>
+  </div>
+
+  <div class="file-grid" id="mergeList"></div>
+  <div class="hint" id="mergeHint" style="display:none">☰ Card drag गरेर क्रम मिलाउनुहोस् • ↻ Rotate button ले 90° घुमाउनुहोस्</div>
+
+  <button class="action-btn bottom-action-btn" id="mergeBtn">Merge PDFs</button>
+  <div class="status" id="mergeStatus"></div>
+</div>
+
+<!-- ============ IMAGE RESIZER ============ -->
+<div class="panel" id="imgresize">
+  <h2>Image को size परिवर्तन गर्नुहोस्</h2>
+  <div class="drop-zone" id="imgDrop">
+    <div style="font-size:36px">🖼️</div>
+    <p><strong>Click to upload</strong> or drag & drop images</p>
+    <p>↻ थिचेर rotate गर्न सकिन्छ</p>
+  </div>
+  <input type="file" id="imgInput" accept="image/*" multiple>
+
+  <div class="top-action-bar" id="imgTopBar" style="display:none">
+    <span class="count-badge" id="imgCount">0 files</span>
+    <button class="action-btn" id="imgResizeTop">📐 Resize & Download</button>
+  </div>
+
+  <div class="file-grid" id="imgList"></div>
+
+  <div class="resize-panel">
+    <h3>Resize Settings</h3>
+
+    <div class="controls-row">
+      <div class="control-block">
+        <div class="header">
+          <label>📐 Scale (Size %)</label>
+          <span class="value-badge" id="imgScaleValue">100%</span>
+        </div>
+        <input type="range" class="slider-input" id="imgScale" min="10" max="200" value="100" step="1">
+        <div class="slider-marks">
+          <span>10%</span><span>50%</span><span>100%</span><span>150%</span><span>200%</span>
+        </div>
+      </div>
+
+      <div class="control-block">
+        <div class="header">
+          <label>🎚️ Quality</label>
+          <span class="value-badge" id="imgQualityValue">70%</span>
+        </div>
+        <input type="range" class="slider-input" id="imgQuality" min="10" max="100" value="70" step="1">
+        <div class="slider-marks">
+          <span>10%</span><span>50%</span><span>100%</span>
+        </div>
+      </div>
+
+      <div class="control-block">
+        <label>📁 Format</label>
+        <select id="imgFormat">
+          <option value="image/jpeg">JPG</option>
+          <option value="image/png">PNG</option>
+          <option value="image/webp">WEBP</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="size-preview" id="imgSizePreview">
+      <span class="preview-label">📊 पहिलो image को size preview</span>
+      <span class="old-size" id="imgOldSize">— × — px</span>
+      <span class="arrow">→</span>
+      <span class="new-size" id="imgNewSize">— × — px</span>
+    </div>
+  </div>
+
+  <button class="action-btn bottom-action-btn" id="imgResizeBtn">Resize & Download</button>
+  <div class="status" id="imgStatus"></div>
+</div>
+
+<!-- ============ PDF RESIZER ============ -->
+<div class="panel" id="pdfresize">
+  <h2>PDF को page size परिवर्तन गर्नुहोस्</h2>
+  <div class="drop-zone" id="pdfDrop">
+    <div style="font-size:36px">📏</div>
+    <p><strong>Click to upload</strong> a PDF</p>
+    <p>↻ थिचेर rotate गर्न सकिन्छ</p>
+  </div>
+  <input type="file" id="pdfInput" accept="application/pdf">
+
+  <div class="top-action-bar" id="pdfResizeTopBar" style="display:none">
+    <span class="count-badge" id="pdfResizeCount">0 files</span>
+    <button class="action-btn" id="pdfResizeTopBtn">📏 Resize PDF</button>
+  </div>
+
+  <div class="file-grid" id="pdfList"></div>
+
+  <div class="options" style="margin-top:20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px">
+    <div><label style="display:block;font-size:13px;font-weight:600;margin-bottom:5px;color:#555">New Page Size</label>
+      <select id="pdfPageSize" style="width:100%;padding:9px 12px;border:1px solid #ddd;border-radius:6px;font-size:14px">
+        <option value="a4">A4 (595 x 842)</option>
+        <option value="letter">Letter (612 x 792)</option>
+        <option value="legal">Legal (612 x 1008)</option>
+        <option value="a3">A3 (842 x 1191)</option>
+        <option value="a5">A5 (420 x 595)</option>
+      </select>
+    </div>
+    <div><label style="display:block;font-size:13px;font-weight:600;margin-bottom:5px;color:#555">Orientation</label>
+      <select id="pdfOrientation" style="width:100%;padding:9px 12px;border:1px solid #ddd;border-radius:6px;font-size:14px">
+        <option value="portrait">Portrait</option>
+        <option value="landscape">Landscape</option>
+      </select>
+    </div>
+    <div><label style="display:block;font-size:13px;font-weight:600;margin-bottom:5px;color:#555">Scale Mode</label>
+      <select id="pdfScaleMode" style="width:100%;padding:9px 12px;border:1px solid #ddd;border-radius:6px;font-size:14px">
+        <option value="fit">Fit (keep ratio)</option>
+        <option value="stretch">Stretch to fill</option>
+      </select>
+    </div>
+  </div>
+
+  <button class="action-btn bottom-action-btn" id="pdfResizeBtn">Resize PDF</button>
+  <div class="status" id="pdfStatus"></div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
