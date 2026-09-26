@@ -1,0 +1,361 @@
+/* ============================================================
+   PHOTO PRINT — Complete Styles
+   ============================================================ */
+
+/* Toolbar */
+.photo-toolbar {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  align-items: center;
+}
+.photo-toolbar .spacer { flex: 1; }
+
+.photo-toolbar button {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+.btn-photo-primary { background: #e5322d; color: white; }
+.btn-photo-primary:hover { background: #c42621; }
+.btn-photo-secondary { background: #f0f2f5; color: #333; border: 1px solid #ddd; }
+.btn-photo-secondary:hover { background: #e4e7eb; }
+.btn-photo-danger { background: #fff0f0; color: #c42621; border: 1px solid #fcc; }
+.btn-photo-danger:hover { background: #ffe0e0; }
+
+.photo-count-badge {
+  background: #fff5f5;
+  color: #e5322d;
+  border: 2px solid #e5322d;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* Upload Zone */
+.photo-drop {
+  border: 2px dashed #ccc;
+  border-radius: 12px;
+  padding: 40px 20px;
+  text-align: center;
+  cursor: pointer;
+  background: #fafafa;
+  transition: all 0.2s;
+  margin-bottom: 20px;
+}
+.photo-drop:hover, .photo-drop.dragover {
+  border-color: #e5322d;
+  background: #fff5f5;
+}
+.photo-drop .icon {
+  font-size: 48px;
+  margin-bottom: 8px;
+}
+.photo-drop p {
+  color: #666;
+  margin-top: 6px;
+  font-size: 13px;
+}
+.photo-drop strong { color: #e5322d; }
+
+/* Photo Grid (uploaded photos) */
+.photo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.photo-item {
+  position: relative;
+  aspect-ratio: 1;
+  background: #f0f2f5;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: grab;
+  border: 2px solid transparent;
+  transition: all 0.15s;
+}
+.photo-item:hover { border-color: #e5322d; }
+.photo-item.dragging { opacity: 0.4; }
+.photo-item.drag-over { border-color: #e5322d; border-style: dashed; }
+
+.photo-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  pointer-events: none;
+}
+.photo-item img.rot-90 { transform: rotate(90deg); }
+.photo-item img.rot-180 { transform: rotate(180deg); }
+.photo-item img.rot-270 { transform: rotate(270deg); }
+
+.photo-order {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  background: #e5322d;
+  color: white;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  z-index: 2;
+}
+
+.photo-detect-badge {
+  position: absolute;
+  bottom: 4px;
+  left: 4px;
+  background: rgba(26,127,55,0.9);
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  z-index: 2;
+  white-space: nowrap;
+}
+
+.photo-actions {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.photo-item:hover .photo-actions { opacity: 1; }
+.photo-actions button {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  border: none;
+  background: rgba(255,255,255,0.95);
+  color: #333;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+.photo-actions button:hover {
+  background: white;
+  transform: scale(1.1);
+}
+.photo-actions button.danger:hover {
+  background: #ff5b5b;
+  color: white;
+}
+
+/* Settings Panel */
+.photo-settings {
+  background: #fafbfc;
+  border: 2px solid #e8ebef;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+.photo-settings h3 {
+  font-size: 15px;
+  color: #333;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.photo-settings h3::before {
+  content: '';
+  display: inline-block;
+  width: 4px;
+  height: 18px;
+  background: #e5322d;
+  border-radius: 2px;
+}
+
+.photo-settings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 14px;
+}
+.photo-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.photo-field label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #555;
+}
+.photo-field select,
+.photo-field input[type="number"],
+.photo-field input[type="text"] {
+  padding: 9px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+  background: white;
+  width: 100%;
+}
+.photo-field select:focus,
+.photo-field input:focus {
+  outline: none;
+  border-color: #e5322d;
+  box-shadow: 0 0 0 3px rgba(229,50,45,0.1);
+}
+.photo-field input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+.photo-field input[type="color"] {
+  width: 100%;
+  height: 40px;
+  padding: 2px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* Custom wrap (यदि छ भने) */
+.photo-custom-wrap {
+  display: flex;
+  gap: 10px;
+  grid-column: 1 / -1;
+}
+.photo-custom-wrap .photo-field { flex: 1; }
+
+/* Preview */
+.photo-preview-wrap {
+  background: #fafbfc;
+  border: 2px solid #e8ebef;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+.photo-preview-wrap h3 {
+  font-size: 15px;
+  color: #333;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.photo-preview-wrap h3::before {
+  content: '';
+  display: inline-block;
+  width: 4px;
+  height: 18px;
+  background: #e5322d;
+  border-radius: 2px;
+}
+
+.photo-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: white;
+  border-radius: 8px;
+  min-height: 300px;
+  overflow: auto;
+  gap: 16px;
+}
+
+.preview-empty {
+  color: #999;
+  text-align: center;
+  font-size: 14px;
+  padding: 60px 20px;
+}
+
+.preview-paper {
+  position: relative;
+  background: white;
+}
+
+.preview-photo {
+  position: absolute;
+  overflow: hidden;
+  background: #f0f0f0;
+}
+.preview-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.preview-photo img.rot-90 { transform: rotate(90deg); }
+.preview-photo img.rot-180 { transform: rotate(180deg); }
+.preview-photo img.rot-270 { transform: rotate(270deg); }
+
+.preview-info {
+  padding: 10px 16px;
+  background: #f0f2f5;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #555;
+  text-align: center;
+  line-height: 1.6;
+}
+
+/* Empty state (कुनै photo नभएको बेला) */
+.photo-empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: #999;
+  display: none;
+}
+.photo-empty-state.show { display: block; }
+.photo-empty-state .icon {
+  font-size: 56px;
+  margin-bottom: 10px;
+}
+.photo-empty-state h3 {
+  color: #555;
+  margin-bottom: 6px;
+  font-size: 18px;
+}
+.photo-empty-state p {
+  color: #888;
+  font-size: 14px;
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .photo-grid {
+    grid-template-columns: repeat(auto-fill, minmax(85px, 1fr));
+    gap: 8px;
+  }
+  .photo-settings-grid {
+    grid-template-columns: 1fr;
+  }
+  .photo-toolbar button {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+  .photo-preview {
+    padding: 12px;
+    min-height: 200px;
+  }
+  .preview-info {
+    font-size: 11px;
+  }
+}

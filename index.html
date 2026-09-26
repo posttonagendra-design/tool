@@ -6,6 +6,7 @@
 <title>PDF Toolkit</title>
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="notes.css">
+<link rel="stylesheet" href="photo-print.css">
 <script src="jspdf.umd.min.js"></script>
 <script src="pdf-lib.min.js"></script>
 <script src="pdf.min.js"></script>
@@ -27,7 +28,7 @@
     <span class="brand-text">Toolkit</span>
   </div>
 
-    <nav class="sidebar-nav">
+      <nav class="sidebar-nav">
     <a class="nav-item active" data-page="pdf">
       <span class="nav-icon">📄</span>
       <span class="nav-label">PDF Toolkit</span>
@@ -39,6 +40,10 @@
     <a class="nav-item" data-page="notes">
       <span class="nav-icon">📝</span>
       <span class="nav-label">Notes</span>
+    </a>
+    <a class="nav-item" data-page="photo">
+      <span class="nav-icon">🖼️</span>
+      <span class="nav-label">Photo Print</span>
     </a>
   </nav>
 
@@ -399,6 +404,114 @@
     </div>
   </div>
 
+  <!-- ========== PAGE 4: PHOTO PRINT ========== -->
+  <div class="page" id="page-photo">
+    <h2 class="page-title">🖼️ Photo Print</h2>
+    <p class="page-sub">Photo upload गर्नुहोस्, layout मिलाउनुहोस्, print गर्नुहोस्</p>
+
+    <div class="photo-toolbar">
+      <span class="photo-count-badge" id="photoCount" style="display:none">0 photos</span>
+      <div class="spacer"></div>
+      <button class="btn-photo-secondary" id="photoImageBtn" title="Save as PNG">🖼️ PNG</button>
+      <button class="btn-photo-secondary" id="photoPdfBtn" title="Download PDF">📥 PDF</button>
+      <button class="btn-photo-primary" id="photoPrintBtn" title="Print">🖨️ Print</button>
+      <button class="btn-photo-danger" id="photoClearBtn" title="Clear all">🗑️</button>
+    </div>
+
+    <div class="photo-drop" id="photoDrop">
+      <div class="icon">📷</div>
+      <p><strong>Click to upload</strong> or drag & drop photos</p>
+      <p>JPG, PNG, WEBP — multiple allowed</p>
+    </div>
+    <input type="file" id="photoInput" accept="image/*" multiple>
+
+    <div class="photo-grid" id="photoGrid"></div>
+
+    <div class="photo-empty-state" id="photoEmpty">
+      <div class="icon">🖼️</div>
+      <h3>अझै कुनै photo छैन</h3>
+      <p>Photo upload गर्नुहोस् — preview र print options देखिनेछ</p>
+    </div>
+
+
+    <!-- Settings -->
+    <div class="photo-settings">
+      <h3>⚙️ Settings</h3>
+
+      <div class="photo-settings-grid">
+
+        <div class="photo-field">
+          <label>Photo Size</label>
+          <select id="photoSize">
+            <option value="auto" selected>Auto (25×30mm)</option>
+            <option value="passport">Passport (35×45mm)</option>
+            <option value="detect">Auto-detect</option>
+          </select>
+        </div>
+
+        <div class="photo-field">
+          <label>Paper Size</label>
+          <select id="paperSize">
+            <option value="a4">A4 (210×297mm)</option>
+            <option value="4r" selected>4R (102×152mm)</option>
+            <option value="3r">3R (89×127mm)</option>
+          </select>
+        </div>
+
+        <div class="photo-field">
+          <label>Paper Orientation</label>
+          <select id="paperOrientation">
+            <option value="portrait" selected>Portrait</option>
+            <option value="landscape">Landscape</option>
+          </select>
+        </div>
+
+        <div class="photo-field">
+          <label>Photos per Row</label>
+          <input type="number" id="photoCols" value="4" min="1" max="20">
+        </div>
+
+        <div class="photo-field">
+          <label>Number of Rows</label>
+          <input type="number" id="photoRows" value="3" min="1" max="20">
+        </div>
+ <div class="photo-field">
+          <label>Copies (कति print?)</label>
+          <input type="number" id="photoCopies" value="12" min="1" max="500">
+        </div>
+
+        <div class="photo-field">
+          <label>Margin (mm)</label>
+          <input type="number" id="photoMargin" value="1" min="0" max="20" step="0.5">
+        </div>
+
+        <div class="photo-field">
+          <label>Gap (mm)</label>
+          <input type="number" id="photoGap" value="0" min="0" max="20" step="0.5">
+        </div>
+
+        <div class="photo-field">
+          <label>Background</label>
+          <input type="color" id="photoBgColor" value="#ffffff">
+        </div>
+
+        <div class="photo-field">
+          <label>Crop Marks</label>
+          <input type="checkbox" id="photoCropMarks">
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Preview -->
+    <div class="photo-preview-wrap">
+      <h3>👁️ Live Preview</h3>
+      <div class="photo-preview" id="photoPreview"></div>
+    </div>
+
+  </div>    
+
+
   <!-- ========== NOTE EDITOR MODAL ========== -->
   <div class="note-editor-modal" id="noteEditorModal">
     <div class="note-editor-content">
@@ -460,5 +573,6 @@
 <script src="notes-storage-local.js"></script>
 <script src="notes-storage.js"></script>
 <script src="notes.js"></script>
+<script src="photo-print.js"></script>
 </body>
 </html>
