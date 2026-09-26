@@ -444,6 +444,168 @@
     setTimeout(function() { if (btn) btn.click(); }, 200);
   }
 
+  // ============================================================
+  // 4) DATE DIFFERENCE (BS + AD)
+  // ============================================================
+  var dateMode = 'BS';
+
+  function setupDateDiff() {
+    var modeBtns = document.querySelectorAll('.datediff-mode-btn');
+    var calcBtn = $('dateCalcBtn');
+    var todayBtn = $('dateTodayBtn');
+    if (!calcBtn) {
+      console.warn('Date Diff: dateCalcBtn भेटिएन');
+      return;
+    }
+
+    modeBtns.forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        modeBtns.forEach(function(b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        dateMode = btn.getAttribute('data-mode');
+        var r = $('dateResult');
+        if (r) r.innerHTML = '';
+      });
+    });
+
+    if (todayBtn) {
+      todayBtn.addEventListener('click', function() {
+        var ND = getND();
+        if (!ND) return;
+        var today = new Date();
+
+        if (dateMode === 'BS') {
+          try {
+            var nd = new ND(today);
+            $('dateFromYear').value = nd.getYear();
+            $('dateFromMonth').value = nd.getMonth() + 1;
+            $('dateFromDay').value = nd.getDate();
+          } catch (e) {
+            console.error('Today BS error:', e);
+          }
+        } else {
+          $('dateFromYear').value = today.getFullYear();
+          $('dateFromMonth').value = today.getMonth() + 1;
+          $('dateFromDay').value = today.getDate();
+        }
+      });
+    }
+
+    calcBtn.addEventListener('click', function() {
+      var result = $('dateResult');
+      var fy = parseInt($('dateFromYear').value);
+      var fm = parseInt($('dateFromMonth').value);
+      var fd = parseInt($('dateFromDay').value);
+      var ty = parseInt($('dateToYear').value);
+      var tm = parseInt($('dateToMonth').value);
+      var td = parseInt($('dateToDay').value);
+
+      if (!fy || !fm || !fd || !ty || !tm || !td) {
+        result.innerHTML = '<div class="datediff-error">⚠️ कृपया सबै field भर्नुहोस्।</div>';
+        return;
+      }
+
+      var ND = getND();
+      if (!ND) {
+        result.innerHTML = '<div class="datediff-error">❌ NepaliDate library load भएको छैन।</div>';
+        return;
+      }
+
+      try {
+        var fromDate, toDate;
+
+        if (dateMode === 'BS') {
+          if (fy < 1975 || fy > 2099 || ty < 1975 || ty > 2099) {
+            result.innerHTML = '<div class="datediff-error">⚠️ BS वर्ष 1975-2099 भित्र हुनुपर्छ।</div>';
+            return;
+          }
+          var fromBS = new ND(fy, fm - 1, fd);
+          var toBS = new ND(ty, tm - 1, td);
+          fromDate = fromBS.toJsDate();
+          toDate = toBS.toJsDate();
+        } else {
+          if (fy < 1918 || fy > 2043 || ty < 1918 || ty > 2043) {
+            result.innerHTML = '<div class="datediff-error">⚠️ AD वर्ष 1918-2043 भित्र हुनुपर्छ।</div>';
+            return;
+          }
+          fromDate = new Date(fy, fm - 1, fd);
+          toDate = new Date(ty, tm - 1, td);
+        }
+
+        var diffMs = toDate - fromDate;
+        var diffDays = Math.round(diffMs / 86400000);
+
+        if (diffDays < 0) {
+          result.innerHTML = '<div class="datediff-error">⚠️ "To" मिति "From" भन्दा पछि हुनुपर्छ।</div>';
+          return;
+        }
+
+        var y1 = fromDate.getFullYear();
+        var m1 = fromDate.getMonth();
+        var d1 = fromDate.getDate();
+        var y2 = toDate.getFullYear();
+        var m2 = toDate.getMonth();
+        var d2 = toDate.getDate();
+
+        var years = y2 - y1;
+        var months = m2 - m1;
+        var days = d2 - d1;
+
+        if (days < 0) {
+          months--;
+          var prevMonth = new Date(y2, m2, 0).getDate();
+          days += prevMonth;
+        }
+        if (months < 0) {
+          years--;
+          months += 12;
+        }
+
+        var totalWeeks = Math.floor(diffDays / 7);
+        var totalMonths = (years * 12 + months) + (days / 30);
+        var totalYears = years + (months / 12) + (days / 365);
+
+        var html = '';
+        html += '<div class="datediff-main">';
+        html += '📊 फरक: ';
+        if (years > 0) html += toNepali(years) + ' वर्ष ';
+        if (months > 0) html += toNepali(months) + ' महिना ';
+        if (days > 0) html += toNepali(days) + ' दिन';
+        if (years === 0 && months === 0 && days === 0) html += '० दिन';
+        html += '</div>';
+
+        html += '<div class="datediff-row">';
+        html += '<span class="datediff-row-label">📅 कुल दिन</span>';
+        html += '<span class="datediff-row-value">' + toNepali(diffDays) + '</span>';
+        html += '</div>';
+
+        html += '<div class="datediff-row">';
+        html += '<span class="datediff-row-label">📆 कुल हप्ता</span>';
+        html += '<span class="datediff-row-value">' + toNepali(totalWeeks) + '</span>';
+        html += '</div>';
+
+        html += '<div class="datediff-row">';
+        html += '<span class="datediff-row-label">🗓️ कुल महिना</span>';
+        html += '<span class="datediff-row-value">' + toNepali(totalMonths.toFixed(1)) + '</span>';
+        html += '</div>';
+
+        html += '<div class="datediff-row">';
+        html += '<span class="datediff-row-label">📊 कुल वर्ष</span>';
+        html += '<span class="datediff-row-value">' + toNepali(totalYears.toFixed(2)) + '</span>';
+        html += '</div>';
+
+        result.innerHTML = html;
+
+      } catch (err) {
+        console.error('Date diff error:', err);
+        result.innerHTML = '<div class="datediff-error">❌ त्रुटि: ' + err.message + '</div>';
+      }
+    });
+
+    setTimeout(function() { if (todayBtn) todayBtn.click(); }, 200);
+  }
+
+
   // ============ INIT ============
   function init() {
     if (!$('page-calculator')) return;
@@ -451,6 +613,7 @@
     setupBasic();
     setupUnit();
     setupAge();
+setupDateDiff();
     console.log('🧮 Calculator ready');
   }
 

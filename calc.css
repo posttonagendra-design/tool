@@ -440,3 +440,207 @@
   font-weight: 700;
   color: #1a7f37;
 }
+
+/* ============================================================
+   DATE DIFFERENCE
+   ============================================================ */
+.datediff-wrap {
+  width: 100%;
+}
+
+.datediff-mode {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 12px;
+  background: #fafbfc;
+  border: 2px solid #e8ebef;
+  border-radius: 10px;
+}
+
+.datediff-mode label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #555;
+  margin-right: 8px;
+}
+
+.datediff-mode-btn {
+  padding: 8px 20px;
+  border: 2px solid #e5322d;
+  background: white;
+  color: #e5322d;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 14px;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+
+.datediff-mode-btn.active {
+  background: #e5322d;
+  color: white;
+}
+
+.datediff-section {
+  margin-bottom: 16px;
+}
+
+.datediff-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.datediff-inputs {
+  display: grid;
+  grid-template-columns: 1.5fr 1.5fr 1fr;
+  gap: 10px;
+  background: #fafbfc;
+  border: 2px solid #e8ebef;
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.datediff-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.datediff-field label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.datediff-field input {
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: inherit;
+  background: white;
+  text-align: center;
+}
+
+.datediff-field input:focus {
+  outline: none;
+  border-color: #e5322d;
+  box-shadow: 0 0 0 3px rgba(229,50,45,0.1);
+}
+
+.datediff-actions {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.datediff-today-btn {
+  padding: 12px 20px;
+  background: #f0f2f5;
+  color: #333;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.datediff-today-btn:hover {
+  background: #e4e7eb;
+  border-color: #bbb;
+}
+
+.datediff-calc-btn {
+  flex: 1;
+  padding: 12px 20px;
+  background: #e5322d;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 200px;
+}
+
+.datediff-calc-btn:hover {
+  background: #c42621;
+}
+
+.datediff-result {
+  min-height: 80px;
+  padding: 0;
+}
+
+.datediff-result:not(:empty) {
+  background: #e6f7ed;
+  border-radius: 12px;
+  padding: 18px;
+  border-left: 4px solid #1a7f37;
+}
+
+.datediff-main {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a7f37;
+  margin-bottom: 12px;
+  text-align: center;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(26,127,55,0.2);
+}
+
+.datediff-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: 14px;
+}
+
+.datediff-row-label {
+  color: #555;
+  font-weight: 600;
+}
+
+.datediff-row-value {
+  color: #1a7f37;
+  font-weight: 700;
+}
+
+.datediff-error {
+  background: #fde8e8;
+  color: #c42621;
+  padding: 14px;
+  border-radius: 8px;
+  border-left: 4px solid #c42621;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .datediff-inputs {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+  .datediff-actions {
+    flex-direction: column;
+  }
+  .datediff-calc-btn {
+    width: 100%;
+  }
+}

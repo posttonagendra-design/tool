@@ -409,7 +409,7 @@
     </div>
   </div>
 
-  <!-- ========== PAGE 4: PHOTO PRINT ========== -->
+     <!-- ========== PAGE 4: PHOTO PRINT ========== -->
   <div class="page" id="page-photo">
     <h2 class="page-title">🖼️ Photo Print</h2>
     <p class="page-sub">Photo upload गर्नुहोस्, layout मिलाउनुहोस्, print गर्नुहोस्</p>
@@ -423,112 +423,122 @@
       <button class="btn-photo-danger" id="photoClearBtn" title="Clear all">🗑️</button>
     </div>
 
-    <div class="photo-drop" id="photoDrop">
-      <div class="icon">📷</div>
-      <p><strong>Click to upload</strong> or drag & drop photos</p>
-      <p>JPG, PNG, WEBP — multiple allowed</p>
-    </div>
-    <input type="file" id="photoInput" accept="image/*" multiple>
+    <div class="photo-print-layout">
 
-    <div class="photo-grid" id="photoGrid"></div>
+      <!-- LEFT COLUMN: Upload + Photos + Settings -->
+      <div class="photo-left-col">
 
-    <div class="photo-empty-state" id="photoEmpty">
-      <div class="icon">🖼️</div>
-      <h3>अझै कुनै photo छैन</h3>
-      <p>Photo upload गर्नुहोस् — preview र print options देखिनेछ</p>
-    </div>
+        <div class="photo-drop" id="photoDrop">
+          <div class="icon">📷</div>
+          <p><strong>Click to upload</strong> or drag & drop photos</p>
+          <p>JPG, PNG, WEBP — multiple allowed</p>
+        </div>
+        <input type="file" id="photoInput" accept="image/*" multiple>
 
+        <div class="photo-grid" id="photoGrid"></div>
 
-    <!-- Settings -->
-    <div class="photo-settings">
-      <h3>⚙️ Settings</h3>
-
-      <div class="photo-settings-grid">
-
-        <div class="photo-field">
-          <label>Photo Size</label>
-          <select id="photoSize">
-            <option value="auto" selected>Auto (25×30mm)</option>
-            <option value="passport">Passport (35×45mm)</option>
-            <option value="detect">Auto-detect</option>
-          </select>
+        <div class="photo-empty-state" id="photoEmpty">
+          <div class="icon">🖼️</div>
+          <h3>अझै कुनै photo छैन</h3>
+          <p>Photo upload गर्नुहोस् — preview र print options देखिनेछ</p>
         </div>
 
-        <div class="photo-field">
-          <label>Paper Size</label>
-          <select id="paperSize">
-            <option value="a4">A4 (210×297mm)</option>
-            <option value="4r" selected>4R (102×152mm)</option>
-            <option value="3r">3R (89×127mm)</option>
-          </select>
-        </div>
+        <div class="photo-settings">
+          <h3>⚙️ Settings</h3>
+          <div class="photo-settings-grid">
 
-        <div class="photo-field">
-          <label>Paper Orientation</label>
-          <select id="paperOrientation">
-            <option value="portrait" selected>Portrait</option>
-            <option value="landscape">Landscape</option>
-          </select>
-        </div>
+            <div class="photo-field">
+              <label>Photo Size</label>
+              <select id="photoSize">
+                <option value="auto" selected>Auto (orginal)</option>
+                <option value="passport">Passport (35×45mm)</option>
+                <option value="detect">Auto-detect</option>
+              </select>
+            </div>
 
-        <div class="photo-field">
-          <label>Photos per Row</label>
-          <input type="number" id="photoCols" value="4" min="1" max="20">
-        </div>
+            <div class="photo-field">
+              <label>Paper Size</label>
+              <select id="paperSize">
+                <option value="a4">A4 (210×297mm)</option>
+                <option value="4r" selected>4R (102×152mm)</option>
+                <option value="3r">3R (89×127mm)</option>
+              </select>
+            </div>
 
-        <div class="photo-field">
-          <label>Number of Rows</label>
-          <input type="number" id="photoRows" value="3" min="1" max="20">
-        </div>
- <div class="photo-field">
-          <label>Copies (कति print?)</label>
-          <input type="number" id="photoCopies" value="12" min="1" max="500">
-        </div>
+            <div class="photo-field">
+              <label>Paper Orientation</label>
+              <select id="paperOrientation">
+                <option value="portrait" selected>Portrait</option>
+                <option value="landscape">Landscape</option>
+              </select>
+            </div>
 
-        <div class="photo-field">
-          <label>Margin (mm)</label>
-          <input type="number" id="photoMargin" value="1" min="0" max="20" step="0.5">
-        </div>
+            <div class="photo-field">
+              <label>Photos per Row</label>
+              <input type="number" id="photoCols" value="4" min="1" max="20">
+            </div>
 
-        <div class="photo-field">
-          <label>Gap (mm)</label>
-          <input type="number" id="photoGap" value="0" min="0" max="20" step="0.5">
-        </div>
+            <div class="photo-field">
+              <label>Number of Rows</label>
+              <input type="number" id="photoRows" value="3" min="1" max="20">
+            </div>
 
-        <div class="photo-field">
-          <label>Background</label>
-          <input type="color" id="photoBgColor" value="#ffffff">
-        </div>
+            <div class="photo-field">
+              <label>Margin (mm)</label>
+              <input type="number" id="photoMargin" value="1" min="0" max="20" step="0.5">
+            </div>
 
-        <div class="photo-field">
-          <label>Crop Marks</label>
-          <input type="checkbox" id="photoCropMarks">
+            <div class="photo-field">
+              <label>Gap (mm)</label>
+              <input type="number" id="photoGap" value="0" min="0" max="20" step="0.5">
+            </div>
+
+           
+
+            <div class="photo-field">
+              <label>Background</label>
+              <input type="color" id="photoBgColor" value="#ffffff">
+            </div>
+
+            <div class="photo-field">
+              <label>Crop Marks</label>
+              <input type="checkbox" id="photoCropMarks">
+            </div>
+
+          </div>
         </div>
 
       </div>
+
+      <!-- RIGHT COLUMN: Preview (Sticky) -->
+      <div class="photo-right-col">
+        <div class="photo-preview-wrap">
+          <h3>👁️ Live Preview</h3>
+          <div class="photo-preview" id="photoPreview"></div>
+        </div>
+      </div>
+
     </div>
+  </div>
 
-    <!-- Preview -->
-    <div class="photo-preview-wrap">
-      <h3>👁️ Live Preview</h3>
-      <div class="photo-preview" id="photoPreview"></div>
-    </div>
-
-  </div>    
-
-    <!-- ========== PAGE 5: CALCULATOR ========== -->
+     <!-- ========== PAGE 5: CALCULATOR ========== -->
   <div class="page" id="page-calculator">
     <div class="calc-layout">
+
       <div class="calc-sidebar">
         <h2 class="page-title">🧮 Calculator</h2>
-        <p class="page-sub">Basic • Unit • Age</p>
+        <p class="page-sub">Basic • Unit • Age • Date</p>
         <div class="calc-tabs">
           <button class="calc-tab active" data-calc-tab="basic">🔢 Basic</button>
           <button class="calc-tab" data-calc-tab="unit">📏 Unit</button>
           <button class="calc-tab" data-calc-tab="age">🎂 Age (BS)</button>
+          <button class="calc-tab" data-calc-tab="date">📅 Date Diff</button>
         </div>
       </div>
+
       <div class="calc-content">
+
+        <!-- ========== BASIC ========== -->
         <div class="calc-panel active" id="calc-basic">
           <div class="calc-display" id="calcDisplay">0</div>
           <div class="calc-keys">
@@ -560,6 +570,8 @@
             <div class="calc-history" id="calcHistory"></div>
           </div>
         </div>
+
+        <!-- ========== UNIT ========== -->
         <div class="calc-panel" id="calc-unit">
           <div class="unit-wrap">
             <div class="unit-category-row">
@@ -595,6 +607,8 @@
             </div>
           </div>
         </div>
+
+        <!-- ========== AGE (BS) ========== -->
         <div class="calc-panel" id="calc-age">
           <div class="age-wrap">
             <h3 style="margin-bottom:14px;color:#333;font-size:16px">🎂 जन्म मिति (BS)</h3>
@@ -616,6 +630,63 @@
             <div class="age-result" id="ageResult"></div>
           </div>
         </div>
+
+        <!-- ========== DATE DIFF ========== -->
+        <div class="calc-panel" id="calc-date">
+          <div class="datediff-wrap">
+
+            <div class="datediff-mode">
+              <label>Mode:</label>
+              <button class="datediff-mode-btn active" data-mode="BS">BS</button>
+              <button class="datediff-mode-btn" data-mode="AD">AD</button>
+            </div>
+
+            <div class="datediff-section">
+              <label class="datediff-label">📅 From (सुरु मिति)</label>
+              <div class="datediff-inputs">
+                <div class="datediff-field">
+                  <label>वर्ष</label>
+                  <input type="number" id="dateFromYear" min="1" max="3000" placeholder="2083">
+                </div>
+                <div class="datediff-field">
+                  <label>महिना</label>
+                  <input type="number" id="dateFromMonth" min="1" max="12" placeholder="6">
+                </div>
+                <div class="datediff-field">
+                  <label>गते</label>
+                  <input type="number" id="dateFromDay" min="1" max="32" placeholder="10">
+                </div>
+              </div>
+            </div>
+
+            <div class="datediff-section">
+              <label class="datediff-label">📅 To (अन्त्य मिति)</label>
+              <div class="datediff-inputs">
+                <div class="datediff-field">
+                  <label>वर्ष</label>
+                  <input type="number" id="dateToYear" min="1" max="3000" placeholder="2083">
+                </div>
+                <div class="datediff-field">
+                  <label>महिना</label>
+                  <input type="number" id="dateToMonth" min="1" max="12" placeholder="9">
+                </div>
+                <div class="datediff-field">
+                  <label>गते</label>
+                  <input type="number" id="dateToDay" min="1" max="32" placeholder="15">
+                </div>
+              </div>
+            </div>
+
+            <div class="datediff-actions">
+              <button class="datediff-today-btn" id="dateTodayBtn">📍 आजको मिति</button>
+              <button class="datediff-calc-btn" id="dateCalcBtn">🔄 Calculate Difference</button>
+            </div>
+
+            <div class="datediff-result" id="dateResult"></div>
+
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
@@ -681,7 +752,6 @@
 <script src="notes-storage-local.js"></script>
 <script src="notes-storage.js"></script>
 <script src="notes.js"></script>
-<script src="photo-print.js"></script>
 <script src="photo-print.js"></script>
 <script src="calculator.js"></script>
 </body>

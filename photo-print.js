@@ -1,14 +1,26 @@
 /* ============================================================
-   PHOTO PRINT — Auto-detect + Copies + Layout + Print/PDF/PNG
+   PHOTO PRINT — Original size detect + Rows×Cols + Layout
    ============================================================ */
 (function() {
   'use strict';
   function $(id) { return document.getElementById(id); }
 
+  // ============ CONSTANTS ============
   var PAPER_SIZES = {
     'a4': { w: 210, h: 297 },
     '4r': { w: 102, h: 152 },
     '3r': { w: 89, h: 127 }
+  };
+
+  var PRESET_PHOTO_SIZES = {
+    'small':    { w: 20, h: 25, label: 'Small' },
+    'auto':     { w: 25, h: 30, label: 'Auto' },
+    'indian':   { w: 25, h: 35, label: 'Indian PP' },
+    'medium':   { w: 30, h: 40, label: 'Medium' },
+    'passport': { w: 35, h: 45, label: 'Passport' },
+    'square35': { w: 35, h: 35, label: 'Square 35' },
+    'square50': { w: 50, h: 50, label: 'Square 50' },
+    'square51': { w: 51, h: 51, label: '2×2 inch' }
   };
 
   var DPI = 300;
@@ -16,7 +28,10 @@
   var MM_TO_PX = DPI / MM_PER_INCH;
   var files = [];
 
+  // ============ HELPERS ============
   function mmToPx(mm) { return Math.round(mm * MM_TO_PX); }
+
+  function round2(n) { return Math.round(n * 100) / 100; }
 
   function readAsDataURL(file) {
     return new Promise(function(res, rej) {
@@ -47,25 +62,34 @@
     setTimeout(function() { URL.revokeObjectURL(url); }, 5000);
   }
 
-  // ============ AUTO-DETECT SIZE ============
+  // ============ DETECT ORIGINAL SIZE ============
   function detectPhotoSize(img) {
+    // Pixel → mm @ 300 DPI
     var w_mm = (img.width / DPI) * MM_PER_INCH;
     var h_mm = (img.height / DPI) * MM_PER_INCH;
-    var tol = 3;
-    if (Math.abs(w_mm - 35) <= tol && Math.abs(h_mm - 45) <= tol) {
-      return { preset: 'passport', w: 35, h: 45, detectedW: w_mm, detectedH: h_mm };
-    }
-    if (Math.abs(w_mm - 25) <= tol && Math.abs(h_mm - 30) <= tol) {
-      return { preset: 'auto', w: 25, h: 30, detectedW: w_mm, detectedH: h_mm };
-    }
-    return { preset: 'auto', w: 25, h: 30, detectedW: w_mm, detectedH: h_mm, unmatched: true };
+
+    return {
+      preset: 'original',
+      w: round2(w_mm),
+      h: round2(h_mm),
+      label: 'Original',
+      detectedW: w_mm,
+      detectedH: h_mm,
+      pixelW: img.width,
+      pixelH: img.height
+    };
   }
 
-  // ============ COPIES LOGIC ============
+  // ============ COPIES LOGIC (Rows × Cols) ============
   function getExpandedPhotos() {
-    var copies = parseInt($('photoCopies') && $('photoCopies').value) || 1;
-    if (copies < 1) copies = 1;
-    if (copies > 500) copies = 500;
+    var cols = parseInt($('photoCols') && $('photoCols').value) || 4;
+    var rows = parseInt($('photoRows') && $('photoRows').value) || 3;
+    if (cols < 1) cols = 1;
+    if (rows < 1) rows = 1;
+    if (cols > 20) cols = 20;
+    if (rows > 20) rows = 20;
+    var copies = cols * rows;
+
     var expanded = [];
     files.forEach(function(f) {
       for (var c = 0; c < copies; c++) {
@@ -75,13 +99,27 @@
     return expanded;
   }
 
+  // ============ GET PHOTO SIZE ============
   function getPhotoSize() {
     var key = $('photoSize').value;
-    if (key === 'passport') return { w: 35, h: 45, preset: 'passport' };
-    if (key === 'detect' && files.length && files[0].detected) {
-      return { w: files[0].detected.w, h: files[0].detected.h, preset: files[0].detected.preset };
+
+    // Auto — first photo को actual size
+    if (key === 'auto' || key === 'detect' || !PRESET_PHOTO_SIZES[key]) {
+      if (files.length && files[0].detected) {
+        return {
+          w: files[0].detected.w,
+          h: files[0].detected.h,
+          preset: 'original',
+          label: 'Original'
+        };
+      }
+      // Default — photo छैन
+      return { w: 25, h: 30, preset: 'default', label: 'Default' };
     }
-    return { w: 25, h: 30, preset: 'auto' };
+
+    // Manual preset
+    var p = PRESET_PHOTO_SIZES[key];
+    return { w: p.w, h: p.h, preset: key, label: p.label };
   }
 
   function getPaperSize() {
@@ -102,13 +140,20 @@
     var drop = $('photoDrop');
     var input = $('photoInput');
     if (!drop || !input) return;
-    drop.addEventListener('click', function() { input.click(); });
-    drop.addEventListener('dragover', function(e) {
-      e.preventDefault(); drop.classList.add('dragover');
+
+    drop.addEventListener('click', function() {
+      input.click();
     });
-    drop.addEventListener('dragleave', function() { drop.classList.remove('dragover'); });
+    drop.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      drop.classList.add('dragover');
+    });
+    drop.addEventListener('dragleave', function() {
+      drop.classList.remove('dragover');
+    });
     drop.addEventListener('drop', function(e) {
-      e.preventDefault(); drop.classList.remove('dragover');
+      e.preventDefault();
+      drop.classList.remove('dragover');
       addFiles(Array.prototype.slice.call(e.dataTransfer.files));
     });
     input.addEventListener('change', function() {
@@ -118,15 +163,47 @@
   }
 
   function addFiles(list) {
-    var imgs = list.filter(function(f) {
-      return f.type && f.type.indexOf('image/') === 0;
+    var imgs = [];
+    var rejected = [];
+
+    list.forEach(function(f) {
+      if (!f) return;
+
+      var isImageType = f.type && f.type.indexOf('image/') === 0;
+      var name = (f.name || '').toLowerCase().trim();
+      var ext = name.split('.').pop();
+      var validExts = ['jpg', 'jpeg', 'jpe', 'jfif', 'png', 'gif', 'webp', 'bmp', 'heic', 'heif', 'avif'];
+      var isImageExt = validExts.indexOf(ext) > -1;
+
+      console.log('📁 File check:', {
+        name: f.name,
+        type: f.type || '(खाली)',
+        ext: ext,
+        accepted: isImageType || isImageExt
+      });
+
+      if (isImageType || isImageExt) {
+        imgs.push(f);
+      } else {
+        rejected.push(f.name);
+      }
     });
-    if (!imgs.length) { alert('Image file मात्र upload गर्नुहोस्।'); return; }
+
+    if (rejected.length > 0) {
+      console.warn('⚠️ अस्वीकार भएको file:', rejected.join(', '));
+    }
+
+    if (imgs.length === 0) {
+      alert('कृपया image file (JPG, PNG, WEBP) मात्र upload गर्नुहोस्।');
+      return;
+    }
+
     var done = 0;
     imgs.forEach(function(f) {
       readAsDataURL(f).then(function(url) {
         return loadImage(url).then(function(img) {
           var detected = detectPhotoSize(img);
+          console.log('📷 Detected size:', detected.w + '×' + detected.h + 'mm', '(' + detected.pixelW + '×' + detected.pixelH + 'px)');
           files.push({
             id: 'p_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
             name: f.name,
@@ -138,8 +215,13 @@
           });
           done++;
           if (done === imgs.length) render();
+        }).catch(function(err) {
+          console.error('Load error:', f.name, err);
+          done++;
+          if (done === imgs.length) render();
         });
-      }).catch(function() {
+      }).catch(function(err) {
+        console.error('Read error:', f.name, err);
         done++;
         if (done === imgs.length) render();
       });
@@ -186,8 +268,8 @@
       if (f.detected) {
         var det = document.createElement('span');
         det.className = 'photo-detect-badge';
-        var label = f.detected.preset === 'passport' ? 'Passport' : 'Auto';
-        det.textContent = label + ' • ' + f.detected.w + '×' + f.detected.h;
+        det.textContent = 'Original • ' + f.detected.w + '×' + f.detected.h + 'mm';
+        det.title = f.detected.pixelW + '×' + f.detected.pixelH + ' px @ 300 DPI';
         card.appendChild(det);
       }
 
@@ -252,113 +334,126 @@
 
   // ============ RENDER PREVIEW ============
   function renderPreview() {
-    var wrap = $('photoPreview');
-    if (!wrap) return;
+    try {
+      var wrap = $('photoPreview');
+      if (!wrap) return;
 
-    if (!files.length) {
-      wrap.innerHTML = '<div class="preview-empty">📷 Photo upload गर्नुहोस् — preview यहाँ देखिन्छ</div>';
-      return;
-    }
-
-    var photoSize = getPhotoSize();
-    var paper = getPaperSize();
-    var cols = parseInt($('photoCols').value) || 4;
-    var rows = parseInt($('photoRows').value) || 3;
-    var cropMarks = $('photoCropMarks') && $('photoCropMarks').checked;
-    var bgColor = ($('photoBgColor') && $('photoBgColor').value) || '#ffffff';
-    var gap = parseFloat($('photoGap').value) || 0;
-    var marginVal = getMargin();
-
-    var maxW = 420, maxH = 420;
-    var scale = Math.min(maxW / paper.w, maxH / paper.h);
-
-    var paperWpx = paper.w * scale;
-    var paperHpx = paper.h * scale;
-
-    var totalW = cols * photoSize.w + (cols - 1) * gap;
-    var totalH = rows * photoSize.h + (rows - 1) * gap;
-
-    // Top-aligned with margin
-    var offsetX = Math.max(marginVal, (paper.w - totalW) / 2);
-    var offsetY = marginVal;
-
-    var html = '<div class="preview-paper" style="';
-    html += 'width:' + paperWpx + 'px;';
-    html += 'height:' + paperHpx + 'px;';
-    html += 'background:' + bgColor + ';';
-    html += 'position:relative;';
-    html += 'box-shadow:0 4px 16px rgba(0,0,0,0.15);';
-    html += 'border:1px solid #ddd;';
-    html += 'flex-shrink:0;';
-    html += '">';
-
-    var expandedPhotos = getExpandedPhotos();
-    var photoIdx = 0;
-    var maxPhotos = cols * rows;
-
-    for (var r = 0; r < rows; r++) {
-      for (var c = 0; c < cols; c++) {
-        if (photoIdx >= expandedPhotos.length) break;
-        if (photoIdx >= maxPhotos) break;
-
-        var f = expandedPhotos[photoIdx];
-        var x = (offsetX + c * (photoSize.w + gap)) * scale;
-        var y = (offsetY + r * (photoSize.h + gap)) * scale;
-        var pw = photoSize.w * scale;
-        var ph = photoSize.h * scale;
-
-        var rc = f.rotation === 90 ? 'rot-90' : f.rotation === 180 ? 'rot-180' : f.rotation === 270 ? 'rot-270' : '';
-
-        html += '<div class="preview-photo" style="';
-        html += 'position:absolute;';
-        html += 'left:' + x + 'px;';
-        html += 'top:' + y + 'px;';
-        html += 'width:' + pw + 'px;';
-        html += 'height:' + ph + 'px;';
-        html += 'overflow:hidden;';
-        html += 'background:#f0f0f0;';
-        html += '">';
-        html += '<img src="' + f.dataURL + '" class="' + rc + '" style="';
-        html += 'width:100%;height:100%;object-fit:cover;display:block;';
-        html += '">';
-        if (cropMarks) {
-          html += '<div style="position:absolute;inset:0;border:1px dashed #888;pointer-events:none;"></div>';
-        }
-        html += '</div>';
-        photoIdx++;
+      if (!files.length) {
+        wrap.innerHTML = '<div class="preview-empty">📷 Photo upload गर्नुहोस् — preview यहाँ देखिन्छ</div>';
+        return;
       }
-    }
 
-    if (expandedPhotos.length > maxPhotos) {
-      html += '<div style="position:absolute;bottom:6px;left:50%;transform:translateX(-50%);';
-      html += 'background:rgba(0,0,0,0.7);color:white;padding:4px 12px;border-radius:6px;font-size:11px;white-space:nowrap;">';
-      html += '+' + (expandedPhotos.length - maxPhotos) + ' more copies (next page)';
+      var photoSize = getPhotoSize();
+      var paper = getPaperSize();
+      var cols = parseInt($('photoCols').value) || 4;
+      var rows = parseInt($('photoRows').value) || 3;
+      if (cols < 1) cols = 1;
+      if (rows < 1) rows = 1;
+      if (cols > 20) cols = 20;
+      if (rows > 20) rows = 20;
+
+      var cropMarks = $('photoCropMarks') && $('photoCropMarks').checked;
+      var bgColor = ($('photoBgColor') && $('photoBgColor').value) || '#ffffff';
+      var gap = parseFloat($('photoGap').value) || 0;
+      var marginVal = getMargin();
+
+      var maxW = 420, maxH = 420;
+      var scale = Math.min(maxW / paper.w, maxH / paper.h);
+
+      var paperWpx = paper.w * scale;
+      var paperHpx = paper.h * scale;
+
+      var totalW = cols * photoSize.w + (cols - 1) * gap;
+      var totalH = rows * photoSize.h + (rows - 1) * gap;
+
+      var offsetX = Math.max(marginVal, (paper.w - totalW) / 2);
+      var offsetY = marginVal;
+
+      var html = '<div class="preview-paper" style="';
+      html += 'width:' + paperWpx + 'px;';
+      html += 'height:' + paperHpx + 'px;';
+      html += 'background:' + bgColor + ';';
+      html += 'position:relative;';
+      html += 'box-shadow:0 4px 16px rgba(0,0,0,0.15);';
+      html += 'border:1px solid #ddd;';
+      html += 'flex-shrink:0;';
+      html += '">';
+
+      var expandedPhotos = getExpandedPhotos();
+      var photoIdx = 0;
+      var maxPhotos = cols * rows;
+
+      for (var r = 0; r < rows; r++) {
+        for (var c = 0; c < cols; c++) {
+          if (photoIdx >= expandedPhotos.length) break;
+          if (photoIdx >= maxPhotos) break;
+
+          var f = expandedPhotos[photoIdx];
+          var x = (offsetX + c * (photoSize.w + gap)) * scale;
+          var y = (offsetY + r * (photoSize.h + gap)) * scale;
+          var pw = photoSize.w * scale;
+          var ph = photoSize.h * scale;
+
+          var rc = f.rotation === 90 ? 'rot-90' : f.rotation === 180 ? 'rot-180' : f.rotation === 270 ? 'rot-270' : '';
+
+          html += '<div class="preview-photo" style="';
+          html += 'position:absolute;';
+          html += 'left:' + x + 'px;';
+          html += 'top:' + y + 'px;';
+          html += 'width:' + pw + 'px;';
+          html += 'height:' + ph + 'px;';
+          html += 'overflow:hidden;';
+          html += 'background:#f0f0f0;';
+          html += '">';
+          html += '<img src="' + f.dataURL + '" class="' + rc + '" style="';
+          html += 'width:100%;height:100%;object-fit:cover;display:block;';
+          html += '">';
+          if (cropMarks) {
+            html += '<div style="position:absolute;inset:0;border:1px dashed #888;pointer-events:none;"></div>';
+          }
+          html += '</div>';
+          photoIdx++;
+        }
+      }
       html += '</div>';
-    }
-    html += '</div>';
 
-    var copies = parseInt($('photoCopies') && $('photoCopies').value) || 1;
-    html += '<div class="preview-info">';
-    html += '📐 ' + paper.w + ' × ' + paper.h + ' mm &nbsp;•&nbsp; ';
-    html += '📷 ' + photoSize.w + ' × ' + photoSize.h + ' mm &nbsp;•&nbsp; ';
-    html += '📊 ' + cols + ' × ' + rows + ' = ' + (cols * rows) + ' per page &nbsp;•&nbsp; ';
-    html += '🔢 ' + files.length + ' photo × ' + copies + ' copies = <strong>' + expandedPhotos.length + ' prints</strong>';
-    if (totalW > paper.w || totalH > paper.h) {
-      html += '<br><span style="color:#c42621;font-weight:700;">⚠️ Photos paper भन्दा ठूलो — Rows/Cols घटाउनुहोस्</span>';
-    }
-    html += '</div>';
+      // Info bar
+      html += '<div class="preview-info">';
+      html += '📐 ' + paper.w + ' × ' + paper.h + ' mm &nbsp;•&nbsp; ';
+      html += '📷 ' + photoSize.w + ' × ' + photoSize.h + ' mm';
+      if (photoSize.preset === 'original') {
+        html += ' <span style="color:#1a7f37;font-weight:700;">(Original)</span>';
+      }
+      html += ' &nbsp;•&nbsp; ';
+      html += '📊 ' + cols + ' × ' + rows + ' = <strong>' + (cols * rows) + ' copies</strong>';
+      if (totalW > paper.w || totalH > paper.h) {
+        html += '<br><span style="color:#c42621;font-weight:700;">⚠️ Photos paper भन्दा ठूलो — Rows/Cols घटाउनुहोस्</span>';
+      }
+      html += '</div>';
 
-    wrap.innerHTML = html;
+      wrap.innerHTML = html;
+    } catch (err) {
+      console.error('❌ Preview error:', err);
+    }
   }
 
   // ============ SETTINGS ============
   function setupSettings() {
-    ['photoSize', 'paperSize', 'paperOrientation', 'photoCols', 'photoRows',
-     'photoGap', 'photoMargin', 'photoCropMarks', 'photoBgColor', 'photoCopies'].forEach(function(id) {
+    var ids = ['photoSize', 'paperSize', 'paperOrientation', 'photoCols', 'photoRows',
+               'photoGap', 'photoMargin', 'photoCropMarks', 'photoBgColor'];
+
+    ids.forEach(function(id) {
       var el = $(id);
       if (el) {
-        el.addEventListener('input', renderPreview);
-        el.addEventListener('change', renderPreview);
+        function safeRender() {
+          try {
+            renderPreview();
+          } catch (err) {
+            console.error('❌ Render error for', id, ':', err);
+          }
+        }
+        el.addEventListener('input', safeRender);
+        el.addEventListener('change', safeRender);
       }
     });
   }

@@ -42,13 +42,13 @@
 /* Upload Zone */
 .photo-drop {
   border: 2px dashed #ccc;
-  border-radius: 12px;
-  padding: 40px 20px;
+  border-radius: 10px;
+  padding: 18px 16px;
   text-align: center;
   cursor: pointer;
   background: #fafafa;
   transition: all 0.2s;
-  margin-bottom: 20px;
+  margin-bottom: 14px;
 }
 .photo-drop:hover, .photo-drop.dragover {
   border-color: #e5322d;
@@ -357,5 +357,63 @@
   }
   .preview-info {
     font-size: 11px;
+  }
+}
+/* ============================================================
+   2-COLUMN LAYOUT (Left: Content, Right: Preview)
+   ============================================================ */
+.photo-print-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: start;
+  margin-top: 20px;
+}
+
+.photo-left-col {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.photo-right-col {
+  min-width: 0;
+  position: sticky;
+  top: 20px;
+}
+
+.photo-right-col .photo-preview-wrap {
+  margin-bottom: 0;
+}
+
+.photo-left-col .photo-toolbar {
+  margin-top: 0;
+}
+
+.photo-left-col .photo-grid {
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 8px;
+}
+
+.photo-left-col .photo-settings-grid {
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+}
+
+.photo-right-col .photo-preview {
+  min-height: 500px;
+  padding: 20px;
+}
+
+@media (max-width: 900px) {
+  .photo-print-layout {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .photo-right-col {
+    position: static;
+  }
+  .photo-left-col .photo-grid {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
   }
 }
