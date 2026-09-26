@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="notes.css">
 <link rel="stylesheet" href="photo-print.css">
+<link rel="stylesheet" href="calc.css">
 <script src="jspdf.umd.min.js"></script>
 <script src="pdf-lib.min.js"></script>
 <script src="pdf.min.js"></script>
@@ -44,6 +45,10 @@
     <a class="nav-item" data-page="photo">
       <span class="nav-icon">🖼️</span>
       <span class="nav-label">Photo Print</span>
+    </a>
+    <a class="nav-item" data-page="calculator">
+      <span class="nav-icon">🧮</span>
+      <span class="nav-label">Calculator</span>
     </a>
   </nav>
 
@@ -511,6 +516,109 @@
 
   </div>    
 
+    <!-- ========== PAGE 5: CALCULATOR ========== -->
+  <div class="page" id="page-calculator">
+    <div class="calc-layout">
+      <div class="calc-sidebar">
+        <h2 class="page-title">🧮 Calculator</h2>
+        <p class="page-sub">Basic • Unit • Age</p>
+        <div class="calc-tabs">
+          <button class="calc-tab active" data-calc-tab="basic">🔢 Basic</button>
+          <button class="calc-tab" data-calc-tab="unit">📏 Unit</button>
+          <button class="calc-tab" data-calc-tab="age">🎂 Age (BS)</button>
+        </div>
+      </div>
+      <div class="calc-content">
+        <div class="calc-panel active" id="calc-basic">
+          <div class="calc-display" id="calcDisplay">0</div>
+          <div class="calc-keys">
+            <button class="calc-btn op" data-val="C">C</button>
+            <button class="calc-btn op" data-val="⌫">⌫</button>
+            <button class="calc-btn op" data-val="%">%</button>
+            <button class="calc-btn op" data-val="÷">÷</button>
+            <button class="calc-btn" data-val="7">7</button>
+            <button class="calc-btn" data-val="8">8</button>
+            <button class="calc-btn" data-val="9">9</button>
+            <button class="calc-btn op" data-val="×">×</button>
+            <button class="calc-btn" data-val="4">4</button>
+            <button class="calc-btn" data-val="5">5</button>
+            <button class="calc-btn" data-val="6">6</button>
+            <button class="calc-btn op" data-val="−">−</button>
+            <button class="calc-btn" data-val="1">1</button>
+            <button class="calc-btn" data-val="2">2</button>
+            <button class="calc-btn" data-val="3">3</button>
+            <button class="calc-btn op" data-val="+">+</button>
+            <button class="calc-btn zero" data-val="0">0</button>
+            <button class="calc-btn" data-val=".">.</button>
+            <button class="calc-btn equals" data-val="=">=</button>
+          </div>
+          <div class="calc-history-wrap">
+            <div class="calc-history-header">
+              <h4>📋 History</h4>
+              <button id="calcClearHistory">Clear</button>
+            </div>
+            <div class="calc-history" id="calcHistory"></div>
+          </div>
+        </div>
+        <div class="calc-panel" id="calc-unit">
+          <div class="unit-wrap">
+            <div class="unit-category-row">
+              <label>Category</label>
+              <select id="unitCategory">
+                <option value="length">📏 Length (लम्बाइ)</option>
+                <option value="area">📐 Area (क्षेत्रफल)</option>
+                <option value="volume">📦 Volume (आयतन)</option>
+              </select>
+            </div>
+            <div class="unit-row">
+              <div class="unit-field">
+                <label>From</label>
+                <select id="unitFrom"></select>
+              </div>
+              <div class="unit-field">
+                <label>Value</label>
+                <input type="number" id="unitFromValue" value="1" step="any">
+              </div>
+            </div>
+            <div class="unit-swap-wrap">
+              <button class="unit-swap-btn" id="unitSwap">⇅ Swap</button>
+            </div>
+            <div class="unit-row">
+              <div class="unit-field">
+                <label>To</label>
+                <select id="unitTo"></select>
+              </div>
+              <div class="unit-field">
+                <label>Result</label>
+                <input type="number" id="unitToValue" readonly>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="calc-panel" id="calc-age">
+          <div class="age-wrap">
+            <h3 style="margin-bottom:14px;color:#333;font-size:16px">🎂 जन्म मिति (BS)</h3>
+            <div class="age-input-row">
+              <div class="age-field">
+                <label>वर्ष</label>
+                <select id="ageYear"></select>
+              </div>
+              <div class="age-field">
+                <label>महिना</label>
+                <select id="ageMonth"></select>
+              </div>
+              <div class="age-field">
+                <label>गते</label>
+                <select id="ageDay"></select>
+              </div>
+            </div>
+            <button class="age-calc-btn" id="ageCalcBtn">🎂 उमेर हेर्नुहोस्</button>
+            <div class="age-result" id="ageResult"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- ========== NOTE EDITOR MODAL ========== -->
   <div class="note-editor-modal" id="noteEditorModal">
@@ -574,5 +682,7 @@
 <script src="notes-storage.js"></script>
 <script src="notes.js"></script>
 <script src="photo-print.js"></script>
+<script src="photo-print.js"></script>
+<script src="calculator.js"></script>
 </body>
 </html>
