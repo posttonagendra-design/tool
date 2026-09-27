@@ -8,11 +8,14 @@
 <link rel="stylesheet" href="notes.css">
 <link rel="stylesheet" href="photo-print.css">
 <link rel="stylesheet" href="calc.css">
+<link rel="stylesheet" href="logo-builder.css">
 <script src="jspdf.umd.min.js"></script>
 <script src="pdf-lib.min.js"></script>
 <script src="pdf.min.js"></script>
 <script src="jszip.min.js"></script>
 <script src="nepali-date-converter.umd.js"></script>
+<script src="logo-builder.js"></script>
+
 </head>
 <body>
 
@@ -49,6 +52,10 @@
     <a class="nav-item" data-page="calculator">
       <span class="nav-icon">🧮</span>
       <span class="nav-label">Calculator</span>
+    </a>
+    <a class="nav-item" data-page="logo">
+      <span class="nav-icon">🎨</span>
+      <span class="nav-label">Logo Builder</span>
     </a>
   </nav>
 
@@ -691,6 +698,454 @@
     </div>
   </div>
 
+<!-- ========== PAGE 6: LOGO BUILDER ========== -->
+<div class="page" id="page-logo">
+  <h2 class="page-title">🎨 Logo Builder</h2>
+  <p class="page-sub">विद्यालय वा सरकारी कार्यालयको logo बनाउनुहोस्</p>
+
+  <!-- TEMPLATE TAB BAR -->
+  <div class="template-tab-bar">
+    <button class="template-tab" data-template="school">
+      <span class="tab-icon">🎓</span>
+      <span class="tab-label">
+        <strong>विद्यालय</strong>
+        <small>Curved Top + Bottom Text</small>
+      </span>
+    </button>
+    <button class="template-tab active" data-template="gov">
+      <span class="tab-icon">🏛️</span>
+      <span class="tab-label">
+        <strong>सरकारी कार्यालय</strong>
+        <small>Logo तल ४ Curved Lines</small>
+      </span>
+    </button>
+  </div>
+
+  <div class="logo-builder-layout">
+
+    <!-- ============================================ -->
+    <!-- LEFT: Controls                                -->
+    <!-- ============================================ -->
+    <div class="logo-left-col">
+
+      <!-- ============================================ -->
+      <!-- 🎓 SCHOOL TEMPLATE SECTION                    -->
+      <!-- ============================================ -->
+      <div class="logo-section school-template-section" id="schoolTemplateSection" style="display:none">
+        <h3>🎓 विद्यालय — Logo Image</h3>
+
+        <div class="logo-drop-zone" id="schoolImageDrop">
+          <div class="drop-icon">📤</div>
+          <p><strong>Click to upload</strong> or drag & drop</p>
+          <p>PNG, JPG, SVG • Max 5 MB</p>
+        </div>
+        <input type="file" id="schoolImageInput" accept="image/*" style="display:none">
+
+        <div class="logo-image-preview-wrap" id="schoolImagePreviewWrap" style="display:none">
+          <div class="logo-image-preview">
+            <img id="schoolImagePreview" alt="preview">
+          </div>
+          <div class="logo-image-info" id="schoolImageInfo"></div>
+          <div class="logo-image-buttons">
+            <button class="logo-image-btn replace" id="schoolImageReplaceBtn">🔄 Replace</button>
+            <button class="logo-image-btn remove" id="schoolImageRemoveBtn">🗑️ Remove</button>
+          </div>
+        </div>
+
+        <div id="schoolImageControls" style="display:none">
+          <div class="logo-slider-group">
+            <div class="logo-slider-header">
+              <label>Size (px)</label>
+              <input type="number" id="schoolImageSize" value="150" min="20" max="300" class="logo-slider-value">
+            </div>
+            <input type="range" id="schoolImageSizeSlider" min="20" max="300" value="150" class="logo-slider">
+          </div>
+          <div class="logo-slider-group">
+            <div class="logo-slider-header">
+              <label>Position Y</label>
+              <input type="number" id="schoolImageY" value="0" min="-100" max="100" class="logo-slider-value">
+            </div>
+            <input type="range" id="schoolImageYSlider" min="-100" max="100" value="0" class="logo-slider">
+          </div>
+        </div>
+
+        <!-- Emoji fallback -->
+        <div class="logo-field" id="schoolEmojiField" style="margin-top:10px">
+          <label>वा Emoji प्रयोग गर्नुहोस् (image छैन भने)</label>
+          <input type="text" id="logoIcon" value="📖" maxlength="4">
+        </div>
+      </div>
+
+      <div class="logo-section school-template-section" id="schoolTopSection" style="display:none">
+        <h3>📝 Top Text (माथि)</h3>
+        <div id="logoTopLines"></div>
+        <button class="logo-add-line-btn" id="logoAddTopLine">➕ Add Top Line</button>
+      </div>
+
+      <div class="logo-section school-template-section" id="schoolBottomSection" style="display:none">
+        <h3>📝 Bottom Text (तल)</h3>
+        <div id="logoBottomLines"></div>
+        <button class="logo-add-line-btn" id="logoAddBottomLine">➕ Add Bottom Line</button>
+      </div>
+
+      <div class="logo-section school-template-section" id="schoolStarsSection" style="display:none">
+        <h3>📅 Year & ⭐ Stars (विद्यालय)</h3>
+
+        <!-- Year -->
+        <div class="logo-field">
+          <label>
+            <input type="checkbox" id="logoShowYear" checked>
+            📅 Year देखाउने
+          </label>
+        </div>
+
+        <div class="logo-row-2">
+          <div class="logo-field">
+            <label>Year</label>
+            <input type="text" id="logoYear" value="२०२०" maxlength="10">
+          </div>
+          <div class="logo-field">
+            <label>Year Size (px)</label>
+            <input type="number" id="logoYearSize" value="23" min="8" max="30">
+          </div>
+        </div>
+
+        <!-- Stars -->
+        <div class="logo-field">
+          <label>
+            <input type="checkbox" id="logoShowStars" checked>
+            ⭐ Stars देखाउने
+          </label>
+        </div>
+
+        <div class="logo-row-2">
+          <div class="logo-field">
+            <label>Star Icon</label>
+            <input type="text" id="logoStarIcon" value="★" maxlength="4">
+          </div>
+          <div class="logo-field">
+            <label>Star Size (px)</label>
+            <input type="number" id="logoStarSize" value="44" min="16" max="60">
+          </div>
+        </div>
+
+        <div class="logo-row-2">
+          <div class="logo-field">
+            <label>Position X</label>
+            <input type="number" id="logoStarPosX" value="161" min="0" max="190">
+          </div>
+          <div class="logo-field">
+            <label>Offset Y</label>
+            <input type="number" id="logoStarPosY" value="8" min="-100" max="100">
+          </div>
+        </div>
+
+        <div class="logo-field">
+          <label>
+            <input type="checkbox" id="logoStarCorners">
+            📐 4 कोणमा (चारैतिर)
+          </label>
+        </div>
+      </div>
+
+      <!-- ============================================ -->
+      <!-- 🏛️ GOV TEMPLATE SECTION                      -->
+      <!-- ============================================ -->
+      <div class="logo-section gov-template-section" id="govTemplateSection">
+        <h3>🏛️ सरकारी कार्यालय — Logo Image</h3>
+
+        <div class="logo-drop-zone" id="govImageDrop">
+          <div class="drop-icon">📤</div>
+          <p><strong>Click to upload</strong> or drag & drop</p>
+          <p>PNG, JPG, SVG • Max 5 MB</p>
+        </div>
+        <input type="file" id="govImageInput" accept="image/*" style="display:none">
+
+        <div class="logo-image-preview-wrap" id="govImagePreviewWrap" style="display:none">
+          <div class="logo-image-preview">
+            <img id="govImagePreview" alt="preview">
+          </div>
+          <div class="logo-image-info" id="govImageInfo"></div>
+          <div class="logo-image-buttons">
+            <button class="logo-image-btn replace" id="govImageReplaceBtn">🔄 Replace</button>
+            <button class="logo-image-btn remove" id="govImageRemoveBtn">🗑️ Remove</button>
+          </div>
+        </div>
+
+        <div id="govImageControls" style="display:none">
+          <div class="logo-slider-group">
+            <div class="logo-slider-header">
+              <label>Size (px)</label>
+              <input type="number" id="govImageSize" value="120" min="20" max="300" class="logo-slider-value">
+            </div>
+            <input type="range" id="govImageSizeSlider" min="20" max="300" value="120" class="logo-slider">
+          </div>
+          <div class="logo-slider-group">
+            <div class="logo-slider-header">
+              <label>Position Y</label>
+              <input type="number" id="govImageY" value="0" min="-100" max="100" class="logo-slider-value">
+            </div>
+            <input type="range" id="govImageYSlider" min="-100" max="100" value="0" class="logo-slider">
+          </div>
+        </div>
+      </div>
+
+      <div class="logo-section gov-template-section" id="govLayoutSection">
+        <h3>🎯 Layout (Position & Spacing)</h3>
+
+        <div class="logo-slider-group">
+          <div class="logo-slider-header">
+            <label>Logo बाट पहिलो line को दूरी</label>
+            <input type="number" id="layoutStartGap" value="3" min="0" max="200" class="logo-slider-value">
+          </div>
+          <input type="range" id="layoutStartGapSlider" min="0" max="200" value="3" class="logo-slider">
+        </div>
+
+        <div class="logo-slider-group">
+          <div class="logo-slider-header">
+            <label>Lines बीचको spacing</label>
+            <input type="number" id="layoutLineGap" value="24" min="5" max="80" class="logo-slider-value">
+          </div>
+          <input type="range" id="layoutLineGapSlider" min="5" max="80" value="24" class="logo-slider">
+        </div>
+
+        <div class="logo-slider-group">
+          <div class="logo-slider-header">
+            <label>Overall Y Offset</label>
+            <input type="number" id="layoutYOffset" value="-100" min="-200" max="100" class="logo-slider-value">
+          </div>
+          <input type="range" id="layoutYOffsetSlider" min="-200" max="100" value="-100" class="logo-slider">
+        </div>
+
+        <div class="logo-field">
+          <label>
+            <input type="checkbox" id="layoutAutoFit" checked>
+            ✨ Auto Fit
+          </label>
+        </div>
+
+        <div class="logo-field">
+          <label>Quick Preset</label>
+          <div class="layout-preset-row">
+            <button class="layout-preset-btn" data-preset="tight">Tight</button>
+            <button class="layout-preset-btn active" data-preset="normal">Normal</button>
+            <button class="layout-preset-btn" data-preset="loose">Loose</button>
+            <button class="layout-preset-btn" data-preset="auto">Auto</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="logo-section gov-template-section" id="govLinesSection">
+        <h3>📝 कार्यालयका ४ Lines</h3>
+        <div id="govLinesContainer"></div>
+      </div>
+
+      <div class="logo-section gov-template-section" id="govFontSection">
+        <h3>🔤 Font & Color</h3>
+
+        <div class="logo-row-2">
+          <div class="logo-field">
+            <label>Font Family</label>
+            <select id="govFontFamily">
+              <option value="'Noto Sans Devanagari', sans-serif" selected>Noto Devanagari</option>
+              <option value="'Mangal', sans-serif">Mangal</option>
+              <option value="serif">Serif</option>
+              <option value="sans-serif">Sans-serif</option>
+            </select>
+          </div>
+          <div class="logo-field">
+            <label>Font Weight</label>
+            <select id="govFontWeight">
+              <option value="normal">Normal</option>
+              <option value="600">Semi-Bold</option>
+              <option value="bold" selected>Bold</option>
+              <option value="900">Black</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="logo-slider-group">
+          <div class="logo-slider-header">
+            <label>Global Font Size</label>
+            <input type="number" id="govFontSize" value="24" min="8" max="60" class="logo-slider-value">
+          </div>
+          <input type="range" id="govFontSizeSlider" min="8" max="60" value="24" class="logo-slider">
+        </div>
+
+        <div class="logo-row-2">
+          <div class="logo-field">
+            <label>🎨 Text Color</label>
+            <input type="color" id="govTextColor" value="#000000">
+          </div>
+          <div class="logo-field">
+            <label>Background</label>
+            <input type="color" id="logoBgColor" value="#ffffff">
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ 📏 BORDER & CIRCLE (साझा) ============ -->
+      <div class="logo-section">
+        <h3>📏 Border & Circle</h3>
+
+        <div class="logo-slider-group">
+          <div class="logo-slider-header">
+            <label>Border Width (px)</label>
+            <input type="number" id="logoBorderWidth" value="6" min="1" max="20" class="logo-slider-value">
+          </div>
+          <input type="range" id="logoBorderWidthSlider" min="1" max="20" value="6" class="logo-slider">
+        </div>
+
+        <div class="logo-slider-group">
+          <div class="logo-slider-header">
+            <label>Inner Circle Radius</label>
+            <input type="number" id="logoInnerCircleRadius" value="135" min="50" max="185" class="logo-slider-value">
+          </div>
+          <input type="range" id="logoInnerCircleRadiusSlider" min="50" max="185" value="135" class="logo-slider">
+        </div>
+      </div>
+
+      <!-- 📐 LOGO SIZE -->
+      <div class="logo-section">
+        <h3>📐 Logo Size</h3>
+
+        <div class="size-preset-row">
+          <button class="size-preset-btn" data-inch="1">1"</button>
+          <button class="size-preset-btn" data-inch="1.5">1.5"</button>
+          <button class="size-preset-btn active" data-inch="2">2"</button>
+          <button class="size-preset-btn" data-inch="3">3"</button>
+          <button class="size-preset-btn" data-inch="4">4"</button>
+          <button class="size-preset-btn" data-inch="5">5"</button>
+        </div>
+
+        <div class="size-input-group">
+          <label class="size-label">Width</label>
+          <div class="size-inputs-row">
+            <div class="size-input-wrap">
+              <input type="number" id="logoWidthInch" value="2" min="0.5" max="24" step="0.1">
+              <span class="unit">in</span>
+            </div>
+            <div class="size-input-wrap">
+              <input type="number" id="logoWidthCm" value="5.08" min="1" max="60" step="0.1">
+              <span class="unit">cm</span>
+            </div>
+            <div class="size-input-wrap">
+              <input type="number" id="logoWidthPx" value="300" min="50" max="8000" step="10">
+              <span class="unit">px</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="size-input-group">
+          <label class="size-label">Height</label>
+          <div class="size-inputs-row">
+            <div class="size-input-wrap">
+              <input type="number" id="logoHeightInch" value="2" min="0.5" max="24" step="0.1">
+              <span class="unit">in</span>
+            </div>
+            <div class="size-input-wrap">
+              <input type="number" id="logoHeightCm" value="5.08" min="1" max="60" step="0.1">
+              <span class="unit">cm</span>
+            </div>
+            <div class="size-input-wrap">
+              <input type="number" id="logoHeightPx" value="300" min="50" max="8000" step="10">
+              <span class="unit">px</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="logo-field" style="margin-top:8px">
+          <label>
+            <input type="checkbox" id="logoLockRatio" checked>
+            🔗 Square (Width = Height)
+          </label>
+        </div>
+
+        <div class="logo-field">
+          <label>🖨️ DPI</label>
+          <select id="logoDPI">
+            <option value="72">72 (Screen)</option>
+            <option value="150" selected>150 (Standard)</option>
+            <option value="300">300 (Print)</option>
+            <option value="600">600 (High)</option>
+          </select>
+        </div>
+
+        <div class="size-info-box" id="logoSizeInfo">
+          📊 2" × 2" • 5.08 × 5.08 cm • 300 × 300 px
+        </div>
+      </div>
+
+      <!-- 💾 SAVE/LOAD -->
+      <div class="logo-section">
+        <h3>💾 Save / Load</h3>
+        <button class="logo-btn-save" id="logoSaveBtn" style="width:100%;padding:10px;">💾 Save गर्नुहोस्</button>
+        <div class="logo-saved-list" id="logoSavedList"></div>
+      </div>
+
+    </div>
+    <!-- END LEFT -->
+
+    <!-- ============================================ -->
+    <!-- RIGHT: Preview                                -->
+    <!-- ============================================ -->
+    <div class="logo-right-col">
+      <div class="logo-preview-wrap">
+        <h3>👁️ Live Preview</h3>
+
+        <div class="preview-toolbar">
+          <label class="preview-toggle">
+            <input type="checkbox" id="previewShowCrosshair" checked>
+            <span>🎯 Crosshair</span>
+          </label>
+          <label class="preview-toggle">
+            <input type="checkbox" id="previewShowRuler" checked>
+            <span>📏 Ruler</span>
+          </label>
+          <label class="preview-toggle">
+            <input type="checkbox" id="previewShowGrid" checked>
+            <span>▦ Grid</span>
+          </label>
+          <select id="previewRulerUnit" class="preview-unit">
+            <option value="inch" selected>Inch</option>
+            <option value="cm">CM</option>
+            <option value="px">Pixel</option>
+          </select>
+          <div class="preview-zoom">
+            <button id="previewZoomOut" class="preview-zoom-btn">−</button>
+            <span id="previewZoomLabel" class="preview-zoom-label">100%</span>
+            <button id="previewZoomIn" class="preview-zoom-btn">+</button>
+            <button id="previewZoomFit" class="preview-zoom-btn" title="Fit">⛶</button>
+          </div>
+        </div>
+
+        <div class="preview-stage" id="previewStage">
+          <div class="preview-ruler-top" id="rulerTop"></div>
+          <div class="preview-ruler-left" id="rulerLeft"></div>
+          <div class="preview-ruler-corner"></div>
+          <div class="logo-preview" id="logoPreview">
+            <div class="preview-crosshair" id="previewCrosshair"></div>
+            <div class="preview-grid-overlay" id="previewGrid"></div>
+            <div class="preview-content" id="previewContent"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="logo-actions">
+        <button class="logo-btn-png" id="logoDownloadPng">📥 PNG</button>
+        <button class="logo-btn-svg" id="logoDownloadSvg">📥 SVG</button>
+        <button class="logo-btn-print" id="logoPrintBtn">🖨️ Print</button>
+        <button class="logo-btn-undo" id="logoUndoBtn">↩️ Undo</button>
+        <button class="logo-btn-reset" id="logoResetBtn">🔄 Reset</button>
+      </div>
+    </div>
+    <!-- END RIGHT -->
+
+  </div>
+</div>
+<!-- END page-logo -->
+<!-- END page-logo -->
+
   <!-- ========== NOTE EDITOR MODAL ========== -->
   <div class="note-editor-modal" id="noteEditorModal">
     <div class="note-editor-content">
@@ -754,5 +1209,6 @@
 <script src="notes.js"></script>
 <script src="photo-print.js"></script>
 <script src="calculator.js"></script>
+
 </body>
 </html>
